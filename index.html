@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scroll to Video</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.4.0/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.3.3/ScrollTrigger.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            console.clear();
+            $('video').addClass('video-background');
+
+
+
+            const video = document.querySelector(".video-background");
+            let src = video.currentSrc || video.src;
+            console.log(video, src);
+
+            /* Make sure the video is 'activated' on iOS */
+            function once(el, event, fn, opts) {
+                var onceFn = function (e) {
+                    el.removeEventListener(event, onceFn);
+                    fn.apply(this, arguments);
+                };
+                el.addEventListener(event, onceFn, opts);
+                return onceFn;
+            }
+
+            once(document.documentElement, "touchstart", function (e) {
+                video.play();
+                video.pause();
+            });
+
+            gsap.registerPlugin(ScrollTrigger);
+
+            let tl = gsap.timeline({
+                defaults: { duration: 1 },
+                scrollTrigger: {
+                    trigger: "#container",
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: true,
+                }
+            });
+
+            once(video, "loadedmetadata", () => {
+                tl.fromTo(
+                    video,
+                    {
+                        currentTime: 0
+                    },
+                    {
+                        currentTime: video.duration || 1
+                    }
+                );
+            });
+
+            /*!
+                 * © This code was written by Nicolai Palmkvist.
+                 * For more information, visit my Elementor Youtube channel: https://www.youtube.com/@nicopalmkvist
+                 */
+
+            setTimeout(function () {
+                if (window["fetch"]) {
+                    fetch(src)
+                        .then((response) => response.blob())
+                        .then((response) => {
+                            var blobURL = URL.createObjectURL(response);
+
+                            var t = video.currentTime;
+                            once(document.documentElement, "touchstart", function (e) {
+                                video.play();
+                                video.pause();
+                            });
+
+                            video.setAttribute("src", blobURL);
+                            video.currentTime = t + 0.01;
+                        });
+                }
+            }, 1000);
+        });
+
+    </script>
+</head>
+
+<body>
+    <section id="container">
+        <video muted src="./output.mp4"></video>
+    </section>
+    <section>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur beatae architecto saepe impedit, soluta
+        corporis fugiat doloremque! Accusantium, velit quidem praesentium laudantium natus voluptate, dolores inventore
+        quia, possimus placeat obcaecati. Quidem, nam. Molestiae dolorum, fuga, quo facere voluptate illo, quod totam
+        fugiat ratione aperiam mollitia vero at voluptas necessitatibus a laboriosam possimus explicabo assumenda
+        deserunt? Fugiat, ex architecto. Et qui iusto consequatur alias nobis dicta, ex amet est soluta voluptates,
+        assumenda, libero error eos voluptatem omnis totam eius commodi ipsa rerum repellendus esse fugiat fuga
+        obcaecati rem! Omnis animi labore saepe similique, laborum cupiditate perspiciatis. Maxime tempora itaque
+        recusandae amet!
+    </section>
+</body>
+
+</html>
